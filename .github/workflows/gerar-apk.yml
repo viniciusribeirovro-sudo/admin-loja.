@@ -22,19 +22,11 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Build web e preparar Android
-        working-directory: ${{ env.APP_DIR }}
-        run: |
-          npm install
-          npm run build
-          [ -d android ] || npx cap add android
-          npx cap sync android
-
+      # Usa o build.sh do projeto: chave fixa (debug.keystore), permissão da câmera,
+      # ícones e versionCode crescente.
       - name: Gerar APK
-        working-directory: ${{ env.APP_DIR }}/android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleDebug
+        working-directory: ${{ env.APP_DIR }}
+        run: bash build.sh
 
       - uses: actions/upload-artifact@v4
         with:
