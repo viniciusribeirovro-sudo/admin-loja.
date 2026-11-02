@@ -22,6 +22,18 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Diagnostico da chave
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: |
+          echo "tamanho KEYSTORE_B64 (esperado 3520): ${#KEYSTORE_B64}"
+          echo "tamanho KEYSTORE_PASSWORD (esperado 20): ${#KEYSTORE_PASSWORD}"
+          echo "comeco: ${KEYSTORE_B64:0:12}  fim: ${KEYSTORE_B64: -6}"
+          printf '%s' "$KEYSTORE_B64" | tr -d ' \r\n' | base64 -d > /tmp/t.jks || echo "BASE64 INVALIDO"
+          keytool -list -keystore /tmp/t.jks -storepass "$KEYSTORE_PASSWORD" 2>&1 | grep -v JAVA_TOOL | head -5
+          rm -f /tmp/t.jks
+
       # Usa o build.sh do projeto: permissão da câmera, ícones, versionCode crescente
       # e assinatura com a chave de release (secrets do GitHub).
       - name: Gerar APK
